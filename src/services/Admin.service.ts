@@ -3,14 +3,14 @@ import Errors from '../libs/Error';
 import express from 'express';
 import admincontroller from '../controllers/Admin.Controller';
 // express
-import AdminSchema from '../schema/admin-schema';
+import adminSchema from '../schema/Admin-schema';
 import { AdminInput,Admin } from '../libs/types/admin';
 
  
 class AdminService{
     private readonly adminSchema;
     constructor(){
-        this.adminSchema = AdminSchema;
+        this.adminSchema = adminSchema;
     }
     public async processLogin(input: AdminInput): Promise<string> {
         console.log("AdminService: processLogin ishladi");

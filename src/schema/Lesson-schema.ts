@@ -1,19 +1,36 @@
-import { Schema, model } from "mongoose";
-import { LessonStatus, LessonCollection } from "../libs/enums/Lesson.enums";
-import { Lesson } from "./../libs/types/lesson";
+import mongoose, { Schema, Document } from "mongoose";
 
-const lessonSchema = new Schema<Lesson>({
-  LessonStatus: { type: String, enum: Object.values(LessonStatus), default: LessonStatus.DRAFT },
-  LessonCollection: { type: String, enum: Object.values(LessonCollection), required: true },
-  LessonName: { type: String, required: true },
-  LessonPrice: { type: Number, required: true },
-  LessonDesc: { type: String },
-  LessonImages: { type: [String], required: true },
-  LessonViews: { type: Number, default: 0 },
-  LessonRating: { type: Number, default: 0 },
-  CommentsCount: { type: Number, default: 0 }
-}, {
-  timestamps: true
-});
+export interface LessonDocument extends Document {
+  title: string;
+  description: string;
+  videoUrl: string;
+  thumbnailUrl?: string;
+  category: string;
+  price: number;
+  isFree: boolean;
+  duration: number;
+  viewCount: number;
+  teacher: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-export default model<Lesson>('Lesson', lessonSchema);
+const LessonSchema = new Schema<LessonDocument>(
+  {
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    videoUrl: { type: String, required: true },
+    thumbnailUrl: { type: String },
+    category: { type: String, required: true },
+    price: { type: Number, required: true },
+    isFree: { type: Boolean, default: false },
+    duration: { type: Number, required: true }, // sekund
+    viewCount: { type: Number, default: 0 },
+    teacher: { type: Schema.Types.ObjectId, ref: "Teacher", required: true },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export default mongoose.model<LessonDocument>("Lesson", LessonSchema);

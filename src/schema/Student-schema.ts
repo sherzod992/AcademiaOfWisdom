@@ -3,15 +3,15 @@ import { UserRole } from "../libs/enums/student.enum";
 import { StudentStatus } from "../libs/enums/student.enum";
 
 const StudentSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  StudentName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  Password: { type: String, required: true },
   role: {
     type: String,
     enum: Object.values(UserRole),
     default: UserRole.STUDENT
   },
-  nickName:{
+  StudentNick:{
     type:String,
     required:true,
   },

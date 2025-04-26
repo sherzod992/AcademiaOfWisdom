@@ -1,15 +1,16 @@
 import { ObjectId } from "mongoose";
-import { StudentStatus, Gender, UserRole } from "../enums/student.enum";
-import { TeacherStatus } from "../enums/teacher.enum";
+import { StudentStatus,  UserRole } from "../enums/student.enum";
 
-export interface Teacher {
+
+export interface StudentInput {
   _id?: string;
   FullName: string;
-  nickName:String,
+  StudentName: string;
+  StudentNick: string;
   Email: string;
   Password: string;
   Role: UserRole;  // qo'shildi
-  Status: TeacherStatus;
+  Status: StudentStatus;
   ProfileImage?: string;
   Description?: string;
   Lessons?: string[];
@@ -17,3 +18,12 @@ export interface Teacher {
   updatedAt?: Date;
 }
 
+export interface StudentSignupInput{
+  StudentNick: string;
+  StudentName: string;
+  Password: string;
+}
+export interface StudentLoginInput{
+  StudentNick: string;
+  password: string;
+}

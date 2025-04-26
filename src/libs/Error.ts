@@ -30,6 +30,7 @@ export enum HttpCode {
       code: HttpCode.INTERNAL_SERVER_ERROR,
       errorMessage: Message.SOMETHING_WENT_WRONG,
     };
+      static Message: any;
   
     constructor(statusCode: HttpCode, statusMessage: Message) {
       super(statusMessage); // bu Error.message'ga ham yoziladi

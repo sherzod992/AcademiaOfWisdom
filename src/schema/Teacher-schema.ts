@@ -1,5 +1,6 @@
 import { Schema, model, Types } from "mongoose";
 import { TeacherStatus } from "../libs/enums/teacher.enum";
+import { UserRole } from "../libs/enums/student.enum";
 
 const TeacherSchema = new Schema({
   FullName: {
@@ -10,6 +11,11 @@ const TeacherSchema = new Schema({
     type: String,
     required: true,
     unique: true,
+  },
+  role: {
+    type: String,
+    enum: Object.values(UserRole),
+    default: UserRole.TEACHER,
   },
   Password: {
     type: String,

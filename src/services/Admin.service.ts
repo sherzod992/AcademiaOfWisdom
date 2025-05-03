@@ -1,49 +1,62 @@
-import { AdminRules } from '../libs/enums/Admin.enum';
-import Errors from '../libs/Error';
+
+import Errors, { HttpCode, Message } from '../libs/Error';
 import express from 'express';
+import * as bcrypt from "bcryptjs";
 import admincontroller from '../controllers/Admin.Controller';
 // express
 import adminSchema from '../schema/Admin-schema';
-import { AdminInput,Admin } from '../libs/types/admin';
+
 import StudentSchema from '../schema/Student-schema';
 import TeacherSchema from '../schema/Teacher-schema';
 import LessonSchema from '../schema/Lesson-schema';
 import { error } from 'console';
+import { LoginInput, Member, MemberInput, MemberUpdateInput } from '../libs/types/memebers';
+import { MemberType } from '../libs/enums/memeber.enum';
+import { shapeIntoMongooseObjectId } from '../libs/config';
 
  
 class AdminService {
   private readonly adminSchema;
+  memberModel: any;
   constructor() {
     this.adminSchema = adminSchema;
   }
 
-  public async processLogin(input: AdminInput): Promise<string> {
-    console.log("AdminService: processLogin ishladi");
-    const { email, password } = input;
 
-    const admin = await this.adminSchema.findOne({ email }).exec();
-    if (!admin) {
-      throw new Error("Admin topilmadi");
+
+  public async processSignup(input:MemberInput): Promise<Member>{
+    const exist = await this.memberModel
+   .findOne({memberType: MemberType.ADMIN}).exec();
+  
+   if(exist) throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
+  
+   const salt = await bcrypt.genSalt();
+   input.memberPassword = await bcrypt.hash(input.memberPassword,salt)
+  
+   try{
+       const result =  await this.memberModel.create(input);
+       result.memberPassword = "";
+       return result.toObject() as Member;
+   } catch(err){
+       throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);   
+   }
+  
+  };
+
+  public async processLogin(input:LoginInput): Promise<Member> {
+    const member = await this.memberModel
+    .findOne({memberNick:input.memberNick}, {memberNick: 1,memberPassword:1})
+    .exec();
+
+    if(!member) throw new Errors(HttpCode.NOT_FOUND, Message.NO_MEMBER_NICK)
+
+    const isMatch = await bcrypt.compare(input.memberPassword, member.memberPassword)
+
+    if(!isMatch){
+        throw new Errors(HttpCode.UNAUTHORIZED, Message.WRONG_PASSWORD);
     }
-    if (admin.password !== password) {
-      throw new Error("Parol noto‘g‘ri");
-    }
-    return "Login muvaffaqiyatli";
-  }
-
-  public async processSignup(input: AdminInput): Promise<string> {
-    console.log("AdminService: processSignup ishladi");
-    const { email, password } = input;
-
-    const existingAdmin = await this.adminSchema.findOne({ email }).exec();
-    if (existingAdmin) {
-      throw new Error("Bu email allaqachon ro‘yxatdan o‘tgan");
-    }
-
-    const newAdmin = new this.adminSchema({ email, password });
-    await newAdmin.save();
-    return `Yangi admin: ${email} yaratildi`;
-  }
+    return await this.memberModel.findById(member._id).exec();
+};
 
   public async logout(): Promise<string> {
     console.log("AdminService: logout ishladi");
@@ -70,19 +83,16 @@ class AdminService {
     if (!lessons.length) throw new Error("Darslik topilmadi");
     return lessons;
   }
+  public async updateChosenUser(input: MemberUpdateInput): Promise<Member[]>{
+    input._id = shapeIntoMongooseObjectId(input._id);
+    const result = await this.memberModel.findOneAndUpdate({ _id: input._id },  input, { new: true })
+    .exec();
 
-  public async updateStudetnStatus(studentId: string, status: string): Promise<string> {
-    console.log("AdminService: updateStudetnStatus ishladi");
-    const student = await StudentSchema.findById(studentId).exec();
-    if (!student) {
-      throw new Error("Student topilmadi");
-    }
+    if(!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
 
-    // student.status = status;
-    await student.save();
+    return result;
+}
 
-    return `Student ${studentId} statusi ${status} ga o‘zgartirildi`;
-  }
 }
 
 export default AdminService;

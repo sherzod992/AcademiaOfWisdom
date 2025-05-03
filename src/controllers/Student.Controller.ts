@@ -59,19 +59,30 @@ studentController.viewLessonDetails = async (req:Request, res:Response) => {
 
 
 
-studentController.submitExam = async (req: Request, res: Response) => {
+// studentController.submitExam = async (req: Request, res: Response) => {
+// bu bajarilishi uchun aloxida 
+// };
 
-};
+// studentController.getMyResults = async (req: Request, res: Response) => {
 
-studentController.getMyResults = async (req: Request, res: Response) => {
-
-};
+// };
 
 studentController.getProfile = async (req: Request, res: Response) => {
+  try{
+    const profile = await studentService.getProfile(req.user.id);
+    res.status(200).json({ success: true, data: profile });
+  }catch(err){
+    console.log(err,"Error in getProfile");
+  }
 
 };
 
 studentController.updateProfile = async (req: Request, res: Response) => {
-
+  try{
+    const updatedProfile = await studentService.updateProfile(req.user.id, req.body);
+    res.status(200).json({ success: true, data: updatedProfile });
+  }catch(err){
+    console.log(err,"Error in updateProfile");
+  }
 };
 export default studentController;

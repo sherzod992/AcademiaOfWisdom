@@ -1,3 +1,4 @@
+import { Schema } from "mongoose";
 import { StudentType } from "../libs/enums/student.enum";
 import { StudentInput, StudentLoginInput, StudentSignupInput } from "../libs/types/student.types";
 import LessonSchema, { LessonDocument } from "../schema/Lesson-schema";
@@ -35,6 +36,28 @@ class StudentService {
   }
   public async getLessonById(lessonId: string):Promise<LessonDocument|null>{
     return LessonSchema.findById(lessonId);
+  }
+  public async getProfile(studentId: string): Promise<StudentInput> {
+    const student = await StudentSchema.findById(studentId).select("-password");
+    if (!student) {
+      throw new Error("Student not found");
+    }
+    return student.toObject();
+  }
+
+  // shu studentInputni ozgartrish kerak
+  public async updateProfile(studentId: string, input: StudentInput): Promise<StudentInput> {
+    const updatedStudent = await StudentSchema.findByIdAndUpdate(
+      studentId,
+      input,
+      { new: true, runValidators: true }
+    ).select("-password");
+  
+    if (!updatedStudent) {
+      throw new Error("Student not found");
+    }
+  
+    return updatedStudent.toObject();
   }
 
 }

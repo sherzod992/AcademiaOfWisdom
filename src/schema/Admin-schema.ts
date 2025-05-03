@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { AdminRules } from "../libs/enums/Admin.enum";
+import { MemberStatus, MemberType } from "../libs/enums/memeber.enum";
+import { MemberType } from "../libs/enums/memeber.enum";
 
 // Admin schema
 const adminSchema = new Schema(
@@ -18,6 +19,11 @@ const adminSchema = new Schema(
       type: String,
       required: true,
     },
+    memberType:{
+      type: String,
+      enum: MemberType,
+      default: MemberType.ADMIN,
+    },
     adminNick: {
       type: String,
       required: true,
@@ -25,18 +31,32 @@ const adminSchema = new Schema(
     },
     phoneNumber: {
       type: String,
-      match: [/^\+?[1-9]\d{1,14}$/, 'Please enter a valid phone number'],  // Phone number validation
+      index:{ unique: true, sparse: true }, 
+      match: [/^\+?[1-9]\d{1,14}$/, 'Please enter a valid phone number'],
+      require:true  // Phone number validation
+    },
+    memberAdress:{
+      type:String
     },
     password: {
       type: String,
+      select:false,
       required: true,
+      index:{ unique: true, sparse: true },
       minlength: 6,  // Minimum password length validation
     },
-    adminRule: {
+    memeberStatus:{
       type: String,
-      enum: AdminRules,  // Make sure AdminRules enum is correct
-      default: AdminRules.CAN_MANAGE_ANNOUNCEMENTS,
+      enum:MemberStatus,
+      default: MemberStatus.ACTIVE,
     },
+    memberImage:{
+      type:String,
+    },
+    memberPoints: {
+      type : Number,
+      default:0
+  },
   },
   { timestamps: true }
 );

@@ -1,43 +1,18 @@
+import { ObjectId } from "mongoose";
+
+
+export interface Lesson {
+    _id: ObjectId;
+    lessonName: string;
+    lessonDescription?: string;
+    lessonCollection:string;
+    lessonImage?: string;
+    lessonPrice: number;
+    createdAt: Date;
+    updatedAt: Date;
+    lessonStatus: string;
+}
+
 export interface LessonInput {
-    title: string;
-    description: string;
-    videoUrl: string;
-    thumbnailUrl?: string;
-    category: string;
-    price: number;
-    isFree?: boolean;
-    duration: number; // sekund
-    teacher: string; // teacherId
-  }
-  
-  export interface LessonUpdateInput {
-    title?: string;
-    description?: string;
-    videoUrl?: string;
-    thumbnailUrl?: string;
-    category?: string;
-    price?: number;
-    isFree?: boolean;
-    duration?: number;
-  }
-  
-  export interface LessonResponse {
-    _id: string;
-    title: string;
-    description: string;
-    videoUrl: string;
-    thumbnailUrl?: string;
-    category: string;
-    price: number;
-    isFree: boolean;
-    duration: number;
-    viewCount: number;
-    teacher: {
-      _id: string;
-      name: string;
-      email: string;
-    };
-    createdAt: string;
-    updatedAt: string;
-  }
-  
+    
+}
